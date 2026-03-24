@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>白糖基本面分析系统</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;
+  --text:#e6edf3;--text2:#8b949e;--text3:#6e7681;
+  --accent:#58a6ff;--green:#3fb950;--red:#f85149;--yellow:#d29922;--purple:#bc8cff;--orange:#f0883e;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',sans-serif;font-size:14px}
+
+/* NAV TABS */
+.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+.nav-tabs{display:flex;gap:0}
+.nav-tab{padding:14px 18px;font-size:13px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.nav-tab:hover{color:var(--text)}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.nav-right{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* PANELS */
+.panel{display:none;padding:20px 24px}
+.panel.active{display:block}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.metric{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.metric-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.metric-value{font-size:22px;font-weight:600;line-height:1}
+.metric-sub{font-size:12px;color:var(--text2);margin-top:6px}
+.up{color:var(--red)}.down{color:var(--green)}.neutral{color:var(--text2)}
+
+/* CARDS */
+.grid2{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.grid2e{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px}
+.card-title{font-size:13px;font-weight:500;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.card-title::before{content:'';width:3px;height:13px;background:var(--accent);border-radius:2px;display:inline-block}
+.chart-wrap{position:relative}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:6px 10px;color:var(--text3);font-weight:500;border-bottom:1px solid var(--border)}
+td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3)}
+
+/* SIGNALS */
+.signal{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--bg3);border-radius:8px;margin-bottom:8px}
+.signal-body{flex:1}
+.signal-title{font-size:13px;font-weight:500}
+.signal-desc{font-size:11px;color:var(--text2);margin-top:3px}
+.badge{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:500;margin-left:6px}
+.bull{background:rgba(63,185,80,.15);color:var(--green)}
+.bear{background:rgba(248,81,73,.15);color:var(--red)}
+.neu{background:rgba(139,148,158,.15);color:var(--text2)}
+
+/* SCORE */
+.score-wrap{text-align:center;padding:20px 0}
+.score-num{font-size:64px;font-weight:600;line-height:1}
+.score-label{font-size:13px;color:var(--text2);margin-top:6px}
+.gauge{height:12px;background:linear-gradient(to right,#58a6ff,#3fb950,#d29922,#f85149);border-radius:6px;position:relative;margin:16px auto;max-width:320px}
+.gauge-needle{position:absolute;top:-5px;width:2px;height:22px;background:var(--text);border-radius:1px;transform:translateX(-50%)}
+
+.no-data{text-align:center;color:var(--text3);padding:30px;font-size:13px}
+.err{background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:12px 16px;color:var(--red);font-size:13px;margin-bottom:16px;display:none}
+
+/* Progress bars */
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12px}
+.prog-label{width:80px;color:var(--text2);flex-shrink:0}
+.prog-bar{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px}
+.prog-val{width:40px;text-align:right;color:var(--text2)}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="switchTab('overview')">📊 总览</div>
+    <div class="nav-tab" onclick="switchTab('supply')">🌾 供给</div>
+    <div class="nav-tab" onclick="switchTab('demand')">📦 需求</div>
+    <div class="nav-tab" onclick="switchTab('price')">💹 价格</div>
+    <div class="nav-tab" onclick="switchTab('inventory')">🏭 库存</div>
+    <div class="nav-tab" onclick="switchTab('signal')">🎯 信号</div>
+  </div>
+  <div class="nav-right">
+    <span class="dot"></span>
+    <span id="update-time">加载中...</span>
+  </div>
+</div>
+
+<div class="err" id="err">⚠ 未找到数据，请先运行 python sugar_free_fetcher_v4.py</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 总览 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="panel-overview" class="panel active">
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">主力收盘</div><div class="metric-value" id="m-close">--</div><div class="metric-sub" id="m-close-sub">元/吨</div></div>
+    <div class="metric"><div class="metric-label">持仓量</div><div class="metric-value" id="m-oi">--</div><div class="metric-sub" id="m-oi-sub">手</div></div>
+    <div class="metric"><div class="metric-label">基差</div><div class="metric-value" id="m-basis">--</div><div class="metric-sub" id="m-basis-sub">元/吨</div></div>
+    <div class="metric"><div class="metric-label">05-09价差</div><div class="metric-value" id="m-spread">--</div><div class="metric-sub" id="m-spread-sub">元/吨</div></div>
+    <div class="metric"><div class="metric-label">注册仓单</div><div class="metric-value" id="m-receipt">--</div><div class="metric-sub" id="m-receipt-sub">张</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">基本面综合评分</div>
+      <div class="score-wrap">
+        <div class="score-num" id="score-num" style="color:var(--yellow)">--</div>
+        <div class="score-label" id="score-label">计算中...</div>
+        <div class="gauge"><div class="gauge-needle" id="score-needle" style="left:50%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);max-width:320px;margin:0 auto">
+          <span>强烈看空</span><span>中性</span><span>强烈看多</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">各维度评分</div>
+      <div id="dim-scores"></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">郑糖主力走势（近60日）</div>
+      <div class="chart-wrap" style="height:200px"><canvas id="c-price-overview"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">净多头趋势（前20席位）</div>
+      <div class="chart-wrap" style="height:200px"><canvas id="c-netlong"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 供给 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="panel-supply" class="panel">
+  <div class="grid2e">
+    <div class="card">
+      <div class="card-title">国内主产区产量分布</div>
+      <div id="supply-region" style="padding:8px 0"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">全球主产国占比</div>
+      <div id="supply-global" style="padding:8px 0"></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">巴西中南部压榨进度（2025/26榨季）</div>
+      <div class="chart-wrap" style="height:200px"><canvas id="c-brazil"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">供给关键因素</div>
+      <div id="supply-factors"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 需求 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="panel-demand" class="panel">
+  <div class="grid2e">
+    <div class="card">
+      <div class="card-title">食糖进口月度（万吨）</div>
+      <div class="chart-wrap" style="height:200px"><canvas id="c-import"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">工业用糖下游结构</div>
+      <div id="demand-structure" style="padding:8px 0"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">月度消费季节规律（指数，年均=100）</div>
+    <div class="chart-wrap" style="height:160px"><canvas id="c-season"></canvas></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 价格 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="panel-price" class="panel">
+  <div class="metrics" style="grid-template-columns:repeat(4,1fr)">
+    <div class="metric"><div class="metric-label">郑糖SR605</div><div class="metric-value" id="p-sr">--</div><div class="metric-sub">元/吨</div></div>
+    <div class="metric"><div class="metric-label">纽约原糖#11</div><div class="metric-value" id="p-ny">--</div><div class="metric-sub">美分/磅</div></div>
+    <div class="metric"><div class="metric-label">进口成本参考</div><div class="metric-value" id="p-import-cost">--</div><div class="metric-sub">元/吨（配额内）</div></div>
+    <div class="metric"><div class="metric-label">内外价差</div><div class="metric-value" id="p-diff">--</div><div class="metric-sub">元/吨</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">郑糖主力日线（近120日）</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="c-price-detail"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">纽约原糖#11（近120日，美分/磅）</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="c-ny"></canvas></div>
+    </div>
+  </div>
+  <div class="grid2e">
+    <div class="card">
+      <div class="card-title">跨期价差 SR605-SR609</div>
+      <div class="chart-wrap" style="height:160px"><canvas id="c-spread"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">技术位置参考</div>
+      <div id="tech-levels"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 库存 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="panel-inventory" class="panel">
+  <div class="metrics" style="grid-template-columns:repeat(4,1fr)">
+    <div class="metric"><div class="metric-label">注册仓单</div><div class="metric-value" id="inv-receipt">--</div><div class="metric-sub" id="inv-receipt-sub">张</div></div>
+    <div class="metric"><div class="metric-label">当日增减</div><div class="metric-value" id="inv-chg">--</div><div class="metric-sub">张</div></div>
+    <div class="metric"><div class="metric-label">榨季进度</div><div class="metric-value" id="inv-season">~72%</div><div class="metric-sub">已收榨约28%糖厂</div></div>
+    <div class="metric"><div class="metric-label">库消比</div><div class="metric-value" id="inv-ratio">~21%</div><div class="metric-sub">历史偏低水平</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">注册仓单历史趋势</div>
+      <div class="chart-wrap" style="height:200px"><canvas id="c-receipt"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">持仓量变化</div>
+      <div class="chart-wrap" style="height:200px"><canvas id="c-oi"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">龙虎榜 SR605 — 多空持仓席位（最新交易日）</div>
+    <div class="tbl-wrap" id="rank-table"><div class="no-data">暂无数据</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- 信号 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="panel-signal" class="panel">
+  <div class="grid2e">
+    <div class="card">
+      <div class="card-title">当前利多信号</div>
+      <div id="bull-signals"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">当前利空信号</div>
+      <div id="bear-signals"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">每日多空持仓汇总（前20席位，近20交易日）</div>
+    <div class="chart-wrap" style="height:200px"><canvas id="c-position"></canvas></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">关注数据日历</div>
+    <div id="data-calendar"></div>
+  </div>
+</div>
+
+<script>
+// ─── 全局数据 ───────────────────────────────────────────────
+let D = null;
+const charts = {};
+
+const $ = id => document.getElementById(id);
+const fmt = (v, d=0) => v==null||isNaN(v) ? '--' : Number(v).toLocaleString('zh-CN',{minimumFractionDigits:d,maximumFractionDigits:d});
+
+const CO = {
+  responsive:true, maintainAspectRatio:false,
+  plugins:{ legend:{display:false}, tooltip:{
+    backgroundColor:'#21262d',titleColor:'#e6edf3',bodyColor:'#8b949e',
+    borderColor:'#30363d',borderWidth:1
+  }},
+  scales:{
+    x:{grid:{color:'rgba(48,54,61,.5)'},ticks:{color:'#6e7681',font:{size:11},maxTicksLimit:8}},
+    y:{grid:{color:'rgba(48,54,61,.5)'},ticks:{color:'#6e7681',font:{size:11}}}
+  }
+};
+
+function mkChart(id, type, labels, datasets, opts={}) {
+  if(charts[id]) charts[id].destroy();
+  const ctx = $(id);
+  if(!ctx) return;
+  charts[id] = new Chart(ctx, {type, data:{labels, datasets}, options:{...CO,...opts}});
+}
+
+// ─── 标签页切换 ─────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.nav-tab').forEach((t,i) => {
+    const names = ['overview','supply','demand','price','inventory','signal'];
+    t.classList.toggle('active', names[i]===name);
+  });
+  document.querySelectorAll('.panel').forEach(p => {
+    p.classList.toggle('active', p.id==='panel-'+name);
+  });
+  if(D) renderTab(name);
+}
+
+// ─── 加载数据 ───────────────────────────────────────────────
+async function loadData() {
+  try {
+    const r = await fetch('sugar_data.json?t='+Date.now());
+    if(!r.ok) throw new Error();
+    D = await r.json();
+    $('update-time').textContent = '更新：' + (D.update_time||'--');
+    renderAll();
+  } catch(e) {
+    $('err').style.display='block';
+  }
+}
+
+function renderAll() {
+  renderOverview();
+  renderTab('overview');
+}
+
+function renderTab(name) {
+  if(!D) return;
+  ({
+    overview:  renderOverview,
+    supply:    renderSupply,
+    demand:    renderDemand,
+    price:     renderPrice,
+    inventory: renderInventory,
+    signal:    renderSignal,
+  }[name] || (()=>{}))();
+}
+
+// ─── 总览 ───────────────────────────────────────────────────
+function renderOverview() {
+  const price = D.price||[], receipt = D.receipt||[], spread = D.spread||[], summary = D.rank_summary||[];
+
+  if(price.length) {
+    const last=price[price.length-1], prev=price[price.length-2]||last;
+    const chg=last.close-prev.close;
+    $('m-close').textContent=fmt(last.close);
+    $('m-close').className='metric-value '+(chg>=0?'up':'down');
+    $('m-close-sub').textContent=(chg>=0?'▲':'▼')+' '+fmt(Math.abs(chg),1)+' 元/吨';
+    $('m-oi').textContent=fmt(last.position);
+    $('m-oi').className='metric-value neutral';
+    const oiChg=last.position-(prev.position||last.position);
+    $('m-oi-sub').textContent=(oiChg>=0?'▲':'▼')+' '+fmt(Math.abs(oiChg))+' 手';
+  }
+  if(D.basis!=null) {
+    $('m-basis').textContent=(D.basis>=0?'+':'')+fmt(D.basis,1);
+    $('m-basis').className='metric-value '+(D.basis>=0?'up':'down');
+    $('m-basis-sub').textContent=D.basis>=0?'现货升水':'期货升水';
+  }
+  if(spread.length) {
+    const ls=spread[spread.length-1];
+    $('m-spread').textContent=(ls.spread>=0?'+':'')+fmt(ls.spread,1);
+    $('m-spread').className='metric-value '+(ls.spread>=0?'up':'down');
+    $('m-spread-sub').textContent=ls.spread<0?'Contango':'Back结构';
+  }
+  if(receipt.length) {
+    const lr=receipt[receipt.length-1];
+    $('m-receipt').textContent=fmt(lr.receipt);
+    $('m-receipt').className='metric-value neutral';
+    $('m-receipt-sub').textContent='变化 '+(lr.receipt_chg>=0?'+':'')+fmt(lr.receipt_chg);
+  }
+
+  // 综合评分
+  let score = 50;
+  const factors = [];
+  if(D.basis!=null) { const s=D.basis>100?70:D.basis>0?55:40; factors.push({name:'基差',score:s,w:15}); }
+  if(spread.length) { const ls=spread[spread.length-1]; const s=ls.spread>0?65:ls.spread>-20?50:40; factors.push({name:'价差结构',score:s,w:15}); }
+  if(summary.length) { const ls=summary[summary.length-1]; const s=ls['净多头']<-100000?38:ls['净多头']<-50000?45:ls['净多头']>50000?65:52; factors.push({name:'多空持仓',score:s,w:20}); }
+  if(receipt.length) { const trend=receipt.slice(-5).reduce((a,b)=>a+b.receipt_chg,0); const s=trend<-200?70:trend<0?60:trend>200?35:50; factors.push({name:'仓单趋势',score:s,w:20}); }
+  factors.push({name:'季节规律',score:48,w:15});
+  factors.push({name:'政策面',score:58,w:15});
+
+  if(factors.length) {
+    const tw=factors.reduce((a,f)=>a+f.w,0);
+    score=Math.round(factors.reduce((a,f)=>a+f.score*f.w,0)/tw);
+  }
+
+  $('score-num').textContent=score;
+  $('score-num').style.color=score>=60?'var(--green)':score>=45?'var(--yellow)':'var(--red)';
+  $('score-label').textContent=score>=65?'偏多':score>=55?'略偏多':score>=45?'中性':score>=35?'略偏空':'偏空';
+  $('score-needle').style.left=score+'%';
+
+  $('dim-scores').innerHTML=factors.map(f=>`
+    <div class="prog-row">
+      <span class="prog-label">${f.name}</span>
+      <div class="prog-bar"><div class="prog-fill" style="width:${f.score}%;background:${f.score>=60?'var(--green)':f.score>=45?'var(--yellow)':'var(--red)'}"></div></div>
+      <span class="prog-val">${f.score}</span>
+    </div>`).join('');
+
+  // 价格图
+  if(price.length) {
+    const sl=price.slice(-60);
+    mkChart('c-price-overview','line',sl.map((_,i)=>i+1),[{
+      data:sl.map(p=>p.close),borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,.08)',
+      tension:0.3,fill:true,pointRadius:0,borderWidth:1.5
+    }]);
+  }
+
+  // 净多头
+  if(summary.length) {
+    const sl=summary.slice(-20);
+    mkChart('c-netlong','bar',sl.map(r=>String(r['日期']).slice(4)),[{
+      data:sl.map(r=>r['净多头']),borderRadius:3,
+      backgroundColor:sl.map(r=>r['净多头']>=0?'rgba(63,185,80,.7)':'rgba(248,81,73,.7)')
+    }]);
+  }
+}
+
+// ─── 供给 ───────────────────────────────────────────────────
+function renderSupply() {
+  // 国内主产区
+  const regions=[{name:'广西',pct:62,color:'#58a6ff'},{name:'云南',pct:21,color:'#3fb950'},{name:'广东',pct:8,color:'#d29922'},{name:'其他',pct:9,color:'#6e7681'}];
+  $('supply-region').innerHTML=regions.map(r=>`
+    <div class="prog-row">
+      <span class="prog-label">${r.name}</span>
+      <div class="prog-bar"><div class="prog-fill" style="width:${r.pct}%;background:${r.color}"></div></div>
+      <span class="prog-val">${r.pct}%</span>
+    </div>`).join('');
+
+  const globals=[{name:'巴西',pct:22,color:'#f85149'},{name:'印度',pct:17,color:'#d29922'},{name:'欧盟',pct:9,color:'#58a6ff'},{name:'中国',pct:6,color:'#3fb950'},{name:'其他',pct:46,color:'#6e7681'}];
+  $('supply-global').innerHTML=globals.map(r=>`
+    <div class="prog-row">
+      <span class="prog-label">${r.name}</span>
+      <div class="prog-bar"><div class="prog-fill" style="width:${r.pct*1.5}%;background:${r.color}"></div></div>
+      <span class="prog-val">${r.pct}%</span>
+    </div>`).join('');
+
+  // 巴西压榨进度
+  const brazil=D.brazil||[];
+  if(brazil.length) {
+    const col=Object.keys(brazil[0]).find(k=>k.includes('产糖')||k.includes('sugar')||k.includes('close'))||Object.keys(brazil[0])[2];
+    const labelCol=Object.keys(brazil[0])[0];
+    mkChart('c-brazil','bar',brazil.map(r=>String(r[labelCol]).slice(-5)),[{
+      data:brazil.map(r=>parseFloat(r[col])||0),
+      backgroundColor:'rgba(240,136,62,.7)',borderRadius:3
+    }]);
+  } else {
+    // 示例数据
+    mkChart('c-brazil','bar',['04下','05上','05下','06上','06下','07上'],[{
+      data:[1.82,3.83,6.01,8.36,10.87,13.56],
+      backgroundColor:'rgba(240,136,62,.7)',borderRadius:3,label:'累计产糖（百万吨）'
+    }],{plugins:{legend:{display:true,labels:{color:'#8b949e',font:{size:11}}}}});
+  }
+
+  // 关键因素
+  const factors=[
+    {icon:'🌧️',title:'天气（拉尼娜）',status:'降雨偏多',badge:'bull'},
+    {icon:'🇮🇳',title:'印度出口政策',status:'限制出口中',badge:'bull'},
+    {icon:'🇧🇷',title:'巴西榨季进度',status:'10月开榨，高产',badge:'bear'},
+    {icon:'💰',title:'甘蔗收购价',status:'广西540元/吨',badge:'neu'},
+    {icon:'📅',title:'国内榨季进度',status:'约72%已压榨',badge:'bull'},
+  ];
+  $('supply-factors').innerHTML=factors.map(f=>`
+    <div class="signal">
+      <span style="font-size:18px">${f.icon}</span>
+      <div class="signal-body">
+        <div class="signal-title">${f.title}<span class="badge ${f.badge}">${{bull:'利多',bear:'利空',neu:'中性'}[f.badge]}</span></div>
+        <div class="signal-desc">${f.status}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ─── 需求 ───────────────────────────────────────────────────
+function renderDemand() {
+  const imp = D.import_export||[];
+  if(imp.length) {
+    const labelCol=Object.keys(imp[0]).find(k=>k.includes('月')||k.includes('date')||k.includes('时间'))||Object.keys(imp[0])[0];
+    const valCol=Object.keys(imp[0]).find(k=>k.includes('进口')||k.includes('import')||k.includes('value'))||Object.keys(imp[0])[1];
+    const sl=imp.slice(-12);
+    mkChart('c-import','bar',sl.map(r=>String(r[labelCol]).slice(-5)),[{
+      data:sl.map(r=>parseFloat(r[valCol])||0),
+      backgroundColor:'rgba(88,166,255,.6)',borderRadius:3
+    }]);
+  } else {
+    mkChart('c-import','bar',['2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月','1月'],[{
+      data:[28,32,45,38,52,41,39,48,55,62,58,44],
+      backgroundColor:'rgba(88,166,255,.6)',borderRadius:3
+    }]);
+  }
+
+  // 工业用糖结构
+  const struct=[{name:'饮料行业',pct:38,color:'#58a6ff'},{name:'食品加工',pct:28,color:'#3fb950'},{name:'糖果糕点',pct:18,color:'#d29922'},{name:'乳制品',pct:10,color:'#bc8cff'},{name:'其他',pct:6,color:'#6e7681'}];
+  $('demand-structure').innerHTML=struct.map(r=>`
+    <div class="prog-row">
+      <span class="prog-label">${r.name}</span>
+      <div class="prog-bar"><div class="prog-fill" style="width:${r.pct*2}%;background:${r.color}"></div></div>
+      <span class="prog-val">${r.pct}%</span>
+    </div>`).join('');
+
+  // 季节指数
+  mkChart('c-season','line',['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],[{
+    data:[118,95,88,92,98,108,115,112,105,99,110,130],
+    borderColor:'#bc8cff',backgroundColor:'rgba(188,140,255,.08)',
+    tension:0.4,fill:true,pointRadius:3,borderWidth:1.5
+  }]);
+}
+
+// ─── 价格 ───────────────────────────────────────────────────
+function renderPrice() {
+  const price=D.price||[], ny=D.ny_sugar||[], spread=D.spread||[];
+
+  if(price.length) {
+    const last=price[price.length-1];
+    $('p-sr').textContent=fmt(last.close);
+    // 进口成本估算（纽约原糖×16.535×汇率7.2×1.15关税+运费加工）
+    const nyCost = ny.length ? (ny[ny.length-1].close * 16.535 * 7.2 * 1.15 + 350).toFixed(0) : '--';
+    $('p-import-cost').textContent=nyCost;
+    if(nyCost!=='--') {
+      const diff=last.close - parseFloat(nyCost);
+      $('p-diff').textContent=(diff>=0?'+':'')+fmt(diff,0);
+      $('p-diff').className='metric-value '+(diff>=0?'up':'down');
+    }
+  }
+  if(ny.length) {
+    $('p-ny').textContent=fmt(ny[ny.length-1].close,2);
+  }
+
+  // 郑糖120日
+  if(price.length) {
+    const sl=price.slice(-120);
+    mkChart('c-price-detail','line',sl.map((_,i)=>i+1),[{
+      data:sl.map(p=>p.close),borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,.06)',
+      tension:0.3,fill:true,pointRadius:0,borderWidth:1.5
+    }]);
+  }
+
+  // 纽约原糖120日
+  if(ny.length) {
+    const sl=ny.slice(-120);
+    mkChart('c-ny','line',sl.map((_,i)=>i+1),[{
+      data:sl.map(p=>p.close),borderColor:'#f0883e',backgroundColor:'rgba(240,136,62,.06)',
+      tension:0.3,fill:true,pointRadius:0,borderWidth:1.5
+    }]);
+  } else {
+    $('c-ny').parentElement.innerHTML='<div class="no-data">纽约原糖数据未获取，请检查网络</div>';
+  }
+
+  // 价差
+  if(spread.length) {
+    const sl=spread.slice(-60);
+    mkChart('c-spread','line',sl.map((_,i)=>i+1),[{
+      data:sl.map(r=>r.spread),borderColor:'#bc8cff',backgroundColor:'rgba(188,140,255,.08)',
+      tension:0.3,fill:true,pointRadius:0,borderWidth:1.5
+    }]);
+  }
+
+  // 技术位置
+  const futPrice=D.futures_price||5453;
+  const levels=[
+    {name:'强压力',price:6100,note:'年内高点'},
+    {name:'阻力位',price:5950,note:'前期密集成交'},
+    {name:'当前价',price:futPrice,note:'主力收盘',highlight:true},
+    {name:'支撑位',price:5680,note:'MA60支撑'},
+    {name:'强支撑',price:5500,note:'成本线附近'},
+  ];
+  $('tech-levels').innerHTML=`<table><thead><tr><th>位置</th><th>价格</th><th>意义</th></tr></thead><tbody>
+    ${levels.map(l=>`<tr ${l.highlight?'style="color:var(--accent);font-weight:500"':''}>
+      <td>${l.name}</td><td>${fmt(l.price)}</td><td style="color:var(--text2)">${l.note}</td></tr>`).join('')}
+  </tbody></table>`;
+}
+
+// ─── 库存 ───────────────────────────────────────────────────
+function renderInventory() {
+  const receipt=D.receipt||[], price=D.price||[], rankToday=D.rank_today||[];
+
+  if(receipt.length) {
+    const lr=receipt[receipt.length-1];
+    $('inv-receipt').textContent=fmt(lr.receipt);
+    $('inv-chg').textContent=(lr.receipt_chg>=0?'+':'')+fmt(lr.receipt_chg);
+    $('inv-chg').className='metric-value '+(lr.receipt_chg<0?'down':'up');
+    $('inv-receipt-sub').textContent=lr.date||'';
+  }
+
+  // 仓单历史
+  if(receipt.length) {
+    mkChart('c-receipt','line',receipt.slice(-20).map(r=>String(r.date).slice(4)),[{
+      data:receipt.slice(-20).map(r=>r.receipt),
+      borderColor:'#d29922',backgroundColor:'rgba(210,153,34,.1)',
+      tension:0.3,fill:true,pointRadius:3,borderWidth:1.5
+    }]);
+  }
+
+  // 持仓量
+  if(price.length) {
+    const sl=price.slice(-30);
+    mkChart('c-oi','line',sl.map((_,i)=>i+1),[{
+      data:sl.map(p=>p.position),
+      borderColor:'#3fb950',backgroundColor:'rgba(63,185,80,.08)',
+      tension:0.3,fill:true,pointRadius:0,borderWidth:1.5
+    }]);
+  }
+
+  // 龙虎榜表格
+  if(rankToday.length) {
+    const sr605=rankToday.filter(r=>(r['合约']||'').includes('SR605')).slice(0,10);
+    if(sr605.length) {
+      const cols=Object.keys(sr605[0]).filter(k=>!['日期','合约'].includes(k)).slice(0,10);
+      const headers=['名次','成交会员','交易量','增减','多头会员','持买量','增减','空头会员','持卖量','增减'];
+      $('rank-table').innerHTML=`<table>
+        <thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+        <tbody>${sr605.map(r=>`<tr>${cols.map(c=>`<td>${r[c]||''}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>`;
+    }
+  }
+}
+
+// ─── 信号 ───────────────────────────────────────────────────
+function renderSignal() {
+  const receipt=D.receipt||[], spread=D.spread||[], summary=D.rank_summary||[];
+
+  const bulls=[], bears=[];
+
+  // 基差
+  if(D.basis!=null) {
+    D.basis>50
+      ? bulls.push({icon:'🟢',title:'现货升水',desc:`基差 +${fmt(D.basis,0)} 元/吨，现货偏紧`})
+      : D.basis<-50
+      ? bears.push({icon:'🔴',title:'期货升水',desc:`基差 ${fmt(D.basis,0)} 元/吨`})
+      : bulls.push({icon:'🟡',title:'基差基本平水',desc:`基差 ${fmt(D.basis,0)} 元/吨`});
+  }
+
+  // 价差结构
+  if(spread.length) {
+    const ls=spread[spread.length-1];
+    ls.spread<-20
+      ? bears.push({icon:'🔴',title:'Contango结构',desc:`05-09价差 ${fmt(ls.spread,0)} 元/吨，近弱远强`})
+      : ls.spread>20
+      ? bulls.push({icon:'🟢',title:'Back结构',desc:`05-09价差 +${fmt(ls.spread,0)} 元/吨，近强远弱`})
+      : bulls.push({icon:'🟡',title:'价差中性',desc:`05-09价差 ${fmt(ls.spread,0)} 元/吨`});
+  }
+
+  // 仓单趋势
+  if(receipt.length>=5) {
+    const trend=receipt.slice(-5).reduce((a,b)=>a+b.receipt_chg,0);
+    trend<-200
+      ? bulls.push({icon:'🟢',title:'仓单持续流出',desc:`近5日仓单变化 ${fmt(trend,0)} 张`})
+      : trend>200
+      ? bears.push({icon:'🔴',title:'仓单持续流入',desc:`近5日仓单变化 +${fmt(trend,0)} 张`})
+      : bulls.push({icon:'🟡',title:'仓单持稳',desc:'近期仓单无明显变化'});
+  }
+
+  // 多空持仓
+  if(summary.length) {
+    const ls=summary[summary.length-1];
+    ls['净多头']<-100000
+      ? bears.push({icon:'🔴',title:'空头大幅占优',desc:`净多头 ${fmt(ls['净多头'],0)} 手`})
+      : ls['净多头']>50000
+      ? bulls.push({icon:'🟢',title:'多头持仓占优',desc:`净多头 +${fmt(ls['净多头'],0)} 手`})
+      : bears.push({icon:'🟡',title:'空头略占优',desc:`净多头 ${fmt(ls['净多头'],0)} 手`});
+
+    const recentChg=summary.slice(-3).reduce((a,r)=>a+r['多头增减'],0);
+    recentChg>5000
+      ? bulls.push({icon:'🟢',title:'多头近3日净增仓',desc:`+${fmt(recentChg,0)} 手`})
+      : recentChg<-5000
+      ? bears.push({icon:'🔴',title:'多头近3日净减仓',desc:`${fmt(recentChg,0)} 手`})
+      : null;
+  }
+
+  // 供给面（静态）
+  bulls.push({icon:'🟢',title:'印度限制出口',desc:'本榨季印度政府限制食糖出口，国际供应收紧'});
+  bears.push({icon:'🔴',title:'巴西产量创历史高位',desc:'2025/26榨季巴西产量预计超4200万吨，压制外盘'});
+  bulls.push({icon:'🟢',title:'国内榨季接近尾声',desc:'约72%已压榨，新增供给有限，卖压减弱'});
+
+  const sigHtml = items => items.map(s=>`
+    <div class="signal">
+      <span style="font-size:18px">${s.icon}</span>
+      <div class="signal-body">
+        <div class="signal-title">${s.title}</div>
+        <div class="signal-desc">${s.desc}</div>
+      </div>
+    </div>`).join('');
+
+  $('bull-signals').innerHTML = bulls.length ? sigHtml(bulls) : '<div class="no-data">暂无利多信号</div>';
+  $('bear-signals').innerHTML = bears.length ? sigHtml(bears) : '<div class="no-data">暂无利空信号</div>';
+
+  // 多空持仓图
+  if(summary.length) {
+    const sl=summary.slice(-20);
+    mkChart('c-position','bar',sl.map(r=>String(r['日期']).slice(4)),[
+      {data:sl.map(r=>r['多头持仓']),label:'多头',backgroundColor:'rgba(63,185,80,.6)',borderRadius:2},
+      {data:sl.map(r=>r['空头持仓']*-1),label:'空头（取反）',backgroundColor:'rgba(248,81,73,.6)',borderRadius:2},
+    ],{plugins:{legend:{display:true,labels:{color:'#8b949e',font:{size:11}}}}});
+  }
+
+  // 数据日历
+  const calendar=[
+    {freq:'每月20日',item:'中糖协月度产销存数据',badge:'bull'},
+    {freq:'每周',item:'郑商所注册仓单变化',badge:'bull'},
+    {freq:'每两周',item:'巴西Unica压榨数据',badge:'bear'},
+    {freq:'每月',item:'海关食糖进出口数据',badge:'neu'},
+    {freq:'季度',item:'USDA/ISO全球供需预测',badge:'neu'},
+    {freq:'随时',item:'印度出口政策调整',badge:'bull'},
+    {freq:'随时',item:'天气：广西/云南旱情、巴西干旱',badge:'bull'},
+  ];
+  $('data-calendar').innerHTML=`<table>
+    <thead><tr><th>频率</th><th>数据内容</th><th>方向</th></tr></thead>
+    <tbody>${calendar.map(c=>`<tr>
+      <td style="color:var(--text2)">${c.freq}</td>
+      <td>${c.item}</td>
+      <td><span class="badge ${c.badge}">${{bull:'重点关注',bear:'压制因素',neu:'参考'}[c.badge]}</span></td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+loadData();
+</script>
+</body>
+</html>
