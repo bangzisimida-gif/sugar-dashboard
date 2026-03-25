@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-03-26 00:32",
+  "update_time": "2026-03-26 00:39",
   "basis": 1.0,
   "spot_price": 5430.0,
   "futures_price": 5429.0,
@@ -10016,20 +10016,6 @@
       "type": "flash"
     },
     {
-      "source": "上期所快讯",
-      "title": "【快讯】SHMET03月26日讯，印度政府：将通胀容忍水平下限设定至2%。",
-      "url": "",
-      "time": "2026-03-26 00:10",
-      "type": "flash"
-    },
-    {
-      "source": "上期所快讯",
-      "title": "【快讯】SHMET03月26日讯，印度政府：印度将通胀目标设定为4%，通胀上限容忍水平设定为6%。",
-      "url": "",
-      "time": "2026-03-26 00:09",
-      "type": "flash"
-    },
-    {
       "source": "金十数据",
       "title": "印度政府：将通胀容忍水平下限设定至2%。",
       "url": "",
@@ -10041,27 +10027,6 @@
       "title": "印度政府：印度将通胀目标设定为4%，通胀上限容忍水平设定为6%。",
       "url": "",
       "time": "2026-03-26 00:07",
-      "type": "flash"
-    },
-    {
-      "source": "上期所快讯",
-      "title": "【丹麦首相递交辞呈 新一轮组阁程序启动】SHMET03月26日讯，丹麦首相弗雷泽里克森25日向丹麦国王腓特烈十世递交辞呈，新一轮政府组建程序随即启动。丹麦王室当天发表声明说，弗雷泽里克森在向国王说明议",
-      "url": "",
-      "time": "2026-03-26 00:06",
-      "type": "flash"
-    },
-    {
-      "source": "上期所快讯",
-      "title": "【快讯】SHMET03月26日讯，惠誉：冲突将导致不可抗力，进而造成减产，尤其是在亚洲，因为亚洲对中东原料的依赖度较高。",
-      "url": "",
-      "time": "2026-03-26 00:05",
-      "type": "flash"
-    },
-    {
-      "source": "上期所快讯",
-      "title": "【快讯】SHMET03月26日讯，美国液化天然气出口商Freeport LNG：如果战争不能尽快结束，中断将导致液化天然气项目建设出现一些延误。",
-      "url": "",
-      "time": "2026-03-26 00:04",
       "type": "flash"
     },
     {
@@ -10142,17 +10107,38 @@
       "type": "research"
     },
     {
-      "source": "金十数据",
-      "title": "ISRAEL'S PRIME MINISTER NETANYAHU ON SOUTHERN LEBANON: WE HAVE REMOVED THE THREAT OF AN INVASION OF TOWNS IN NORTHERN IS",
+      "source": "上期所快讯",
+      "title": "【快讯】SHMET03月25日讯，据伊朗新闻电视台：伊朗表示，结束战争的第一条件是停止袭击和暗杀。",
       "url": "",
-      "time": "2026-03-25 23:55",
+      "time": "2026-03-25 22:02",
       "type": "flash"
     },
     {
-      "source": "金十数据",
-      "title": "PAKISTANI SOURCE: THE IRANIANS TOLD US THEY WILL GET BACK TO US TONIGHT. THE MEDIA IS REPORTING THEY’VE SAID NO. BUT WE ",
+      "source": "上期所快讯",
+      "title": "【快讯】SHMET03月25日讯，据伊朗新闻电视台：伊朗表示，不会允许特朗普来决定战争结束的时间。",
       "url": "",
-      "time": "2026-03-25 23:49",
+      "time": "2026-03-25 22:01",
+      "type": "flash"
+    },
+    {
+      "source": "上期所快讯",
+      "title": "【快讯】SHMET03月25日讯，据伊朗新闻电视台：伊朗政府发表声明，伊朗已审阅相关提案，并认为其过于苛刻。",
+      "url": "",
+      "time": "2026-03-25 22:01",
+      "type": "flash"
+    },
+    {
+      "source": "上期所快讯",
+      "title": "【快讯】SHMET03月25日讯，据伊朗新闻电视台：伊朗表示，将在自行选择的时机结束战争。",
+      "url": "",
+      "time": "2026-03-25 22:00",
+      "type": "flash"
+    },
+    {
+      "source": "上期所快讯",
+      "title": "【快讯】SHMET03月25日讯，墨西哥主要股票指数开盘时上涨1%。",
+      "url": "",
+      "time": "2026-03-25 22:00",
       "type": "flash"
     }
   ],
