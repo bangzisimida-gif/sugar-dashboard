@@ -151,17 +151,17 @@ body{font-family:var(--font-sans);color:var(--color-text-primary);background:tra
     <div class="metric">
       <div class="metric-label">本榨季累计产量</div>
       <div class="metric-value">782<span style="font-size:13px">万吨</span></div>
-      <div class="metric-change">截至2月 中糖协</div>
+      <div class="metric-change">截至2月底 中糖协</div>
     </div>
     <div class="metric">
       <div class="metric-label">全年产量预估</div>
       <div class="metric-value">1,020<span style="font-size:13px">万吨</span></div>
-      <div class="metric-change down">USDA 25/26榨季</div>
+      <div class="metric-change down">USDA 25/26榨季预估</div>
     </div>
     <div class="metric">
       <div class="metric-label">巴西25/26榨季</div>
-      <div class="metric-value">4,200<span style="font-size:13px">万吨</span></div>
-      <div class="metric-change up">▲ Unica预估</div>
+      <div class="metric-value">4,350<span style="font-size:13px">万吨</span></div>
+      <div class="metric-change up">▲ Safras预估</div>
     </div>
     <div class="metric">
       <div class="metric-label">WTI原油<span class="tag tag-live">实时</span></div>
@@ -230,16 +230,17 @@ body{font-family:var(--font-sans);color:var(--color-text-primary);background:tra
         <span><span class="dot" style="background:rgba(226,75,74,.5)"></span>其他+当季估算</span>
       </div>
       <div class="chart-wrap" style="height:200px"><canvas id="supplyChart"></canvas></div>
-      <div class="note">25/26榨季：截至2月中糖协累计产糖782万吨（广西87.3%已收榨），USDA全年预估1020万吨，同比-1.1%</div>
+      <div class="note">25/26榨季：截至2月底中糖协累计782万吨；广西估产700-720万吨（云糖网），全国USDA预估1020万吨。24/25实际：广西700万吨，云南241万吨，全国1110万吨</div>
     </div>
     <div class="card">
       <div class="card-title">关键供给因素</div>
       <table class="table">
         <thead><tr><th>因素</th><th>当前状态</th><th>方向</th><th>权重</th></tr></thead>
         <tbody>
-          <tr><td>天气（拉尼娜）</td><td>降雨偏多</td><td><span class="badge badge-bull">利多</span></td><td>★★★★★</td></tr>
+          <tr><td>天气（NOAA ONI）</td><td id="weather-status">加载中...</td><td id="weather-badge"><span class="badge badge-neu">--</span></td><td>★★★★★</td></tr>
           <tr><td>巴西原油/糖醇比</td><td id="brazil-status">计算中</td><td id="brazil-badge"><span class="badge badge-neu">--</span></td><td>★★★★★</td></tr>
           <tr><td>USD/BRL汇率</td><td id="brl-status">计算中</td><td id="brl-badge"><span class="badge badge-neu">--</span></td><td>★★★★</td></tr>
+          <tr id='weather-detail-row'><td colspan='4' style='font-size:11px;color:var(--color-text-secondary);padding:4px 8px' id='weather-detail'></td></tr>
           <tr><td>印度出口政策</td><td>限制出口中</td><td><span class="badge badge-bull">利多</span></td><td>★★★★</td></tr>
           <tr><td>国内榨季进度</td><td>3月底收榨</td><td><span class="badge badge-bull">利多</span></td><td>★★★</td></tr>
           <tr><td>全球库消比</td><td>21.1%，偏低</td><td><span class="badge badge-bull">利多</span></td><td>★★★</td></tr>
@@ -341,7 +342,7 @@ body{font-family:var(--font-sans);color:var(--color-text-primary);background:tra
 
   <div class="two-col">
     <div class="card">
-      <div class="card-title">纽约原糖#11近120日（美分/磅）<span class="tag tag-live">泛糖网</span></div>
+      <div class="card-title">纽约原糖#11近120日（美分/磅）<span class="tag tag-live">泛糖网·前一交易日收盘</span></div>
       <div class="chart-wrap" style="height:180px"><canvas id="nyChart"></canvas></div>
     </div>
     <div class="card">
@@ -624,6 +625,10 @@ function fillMetrics() {
   }
 
   // USD/BRL汇率
+  if(!brl.length){
+    ['ov-brl','sup-brl'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='--';});
+    const bi=document.getElementById('sup-brl-impact');if(bi)bi.textContent='数据暂时不可用，重新运行脚本';
+  }
   if(brl.length){
     const last=brl[brl.length-1], prev=brl[brl.length-2]||last;
     const chg=last.close-prev.close;
@@ -634,7 +639,11 @@ function fillMetrics() {
     const brlAlertEl=document.getElementById('brl-alert');
     if(brlAlertEl)brlAlertEl.innerHTML=`<div class="alert-box alert-${brlA.level}"><strong>${brlA.title}</strong><br>${brlA.desc}</div>`;
     const brlImpact=document.getElementById('sup-brl-impact');
-    if(brlImpact)brlImpact.textContent=chg>0?'美元走强→巴西出口意愿↑':chg<0?'美元走弱→巴西出口意愿↓':'汇率稳定';
+    // 计算近一周变化
+    const weekAgo=brl.length>=5?brl[brl.length-5]:brl[0];
+    const weekChg=last.close-weekAgo.close;
+    const weekPct=(weekChg/weekAgo.close*100).toFixed(2);
+    if(brlImpact)brlImpact.textContent=`近5日${weekChg>=0?'+':''}${weekPct}% | ${chg>0?'美元走强→出口意愿↑':chg<0?'美元走弱→出口意愿↓':'汇率稳定'}`;
     const brlS=document.getElementById('brl-status');
     const brlB=document.getElementById('brl-badge');
     if(brlS)brlS.textContent=`${fmt(last.close,4)} (${chg>=0?'+':''}${fmt(chg,4)})`;
@@ -743,6 +752,15 @@ function initCharts(name) {
   if(!D) return;
   const price=D.price||[], receipt=D.receipt||[], spread=D.spread||[], summary=D.rank_summary||[], ny=D.ny_sugar||[], crude=D.crude_oil||[], brl=D.usd_brl||[];
 
+  // NOAA ONI天气自动显示
+  if(D.weather_oni && D.weather_oni.oni!=null) {
+    const oni=D.weather_oni;
+    const wEl=document.getElementById('weather-status');
+    const wB=document.getElementById('weather-badge');
+    if(wEl) wEl.textContent=`${oni.status}（ONI=${oni.oni}, ${oni.season}）`;
+    if(wB) wB.innerHTML=`<span class="badge badge-${oni.direction==='bull'?'bull':oni.direction==='bear'?'bear':'neu'}">${oni.direction==='bull'?'利多':oni.direction==='bear'?'利空':'中性'}</span>`;
+  }
+
   if(name==='overview'){
     if(price.length&&!charts['c-price-ov']){const sl=price.slice(-60);mkChart('c-price-ov','line',sl.map(p=>fmtD(p.date)),[{data:sl.map(p=>p.close),borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,0.08)',tension:0.3,fill:true,pointRadius:0,borderWidth:1.5}]);}
     if(summary.length&&!charts['c-netlong']){const sl=summary.slice(-20);mkChart('c-netlong','bar',sl.map(r=>String(r['日期']).slice(4)),[{data:sl.map(r=>r['净多头']),borderRadius:3,backgroundColor:sl.map(r=>r['净多头']>=0?'rgba(29,158,117,0.7)':'rgba(226,75,74,0.7)')}]);}
@@ -773,10 +791,10 @@ function initCharts(name) {
     }
     if(!charts.supplyChart){
       new Chart(document.getElementById('supplyChart'),{type:'bar',data:{labels:['20/21','21/22','22/23','23/24','24/25','25/26E'],datasets:[
-        {label:'广西',data:[620,641,602,591,638,570],backgroundColor:'#378ADD',borderRadius:3},
-        {label:'云南',data:[213,221,225,218,221,210],backgroundColor:'#1D9E75',borderRadius:3},
-        {label:'广东',data:[82,78,74,69,72,68],backgroundColor:'#EF9F27',borderRadius:3},
-        {label:'其他',data:[116,111,119,122,107,172],backgroundColor:'rgba(226,75,74,0.4)',borderRadius:3},
+        {label:'广西',data:[641,602,591,600,700,710],backgroundColor:'#378ADD',borderRadius:3},
+        {label:'云南',data:[221,225,218,187,241,220],backgroundColor:'#1D9E75',borderRadius:3},
+        {label:'广东',data:[78,74,69,65,72,68],backgroundColor:'#EF9F27',borderRadius:3},
+        {label:'其他',data:[111,119,122,148,97,22],backgroundColor:'rgba(226,75,74,.5)',borderRadius:3},
       ]},options:baseOpts({scales:{x:{stacked:true,grid:{color:gridColor},ticks:{color:textColor,font:{size:11}}},y:{stacked:true,grid:{color:gridColor},ticks:{color:textColor,font:{size:11}}}}})});
       charts.supplyChart=true;
     }
