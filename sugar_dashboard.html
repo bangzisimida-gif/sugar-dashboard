@@ -74,6 +74,7 @@ body{font-family:var(--font-sans);color:var(--color-text-primary);background:tra
   <button class="tab" onclick="switchTab('price')">价格走势</button>
   <button class="tab" onclick="switchTab('inventory')">库存与榨季</button>
   <button class="tab" onclick="switchTab('signal')">交易信号</button>
+  <button class="tab" onclick="switchTab('news')">消息聚合</button>
 </div>
 
 <!-- ═══ 总览 ═══ -->
@@ -474,6 +475,16 @@ body{font-family:var(--font-sans);color:var(--color-text-primary);background:tra
 </div>
 </div>
 
+<!-- ═══ 消息聚合 ═══ -->
+<div id="panel-news" class="panel">
+  <div class="update-bar" style="margin-bottom:12px">
+    <span>📰 数据来源：泛糖网研报 · 金十数据快讯 · 上期所资讯</span>
+    <span style="font-size:11px;color:var(--color-text-secondary)" id="news-update-time">每次运行脚本自动更新</span>
+  </div>
+  <div id="news-flash" style="margin-bottom:1rem"></div>
+  <div id="news-research"></div>
+</div>
+
 <script>
 const isDark = matchMedia('(prefers-color-scheme:dark)').matches;
 const gridColor = isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)';
@@ -502,7 +513,7 @@ function mkChart(id, type, labels, datasets, extra={}) {
 
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach((t,i)=>{
-    t.classList.toggle('active',['overview','supply','demand','price','inventory','signal'][i]===name);
+    t.classList.toggle('active',['overview','supply','demand','price','inventory','signal','news'][i]===name);
   });
   document.querySelectorAll('.panel').forEach(p=>{
     p.classList.toggle('active',p.id==='panel-'+name);
@@ -746,6 +757,48 @@ function fillMetrics() {
   document.getElementById('signal-list').innerHTML=
     bulls.map(s=>`<div class="signal-card" style="border-color:var(--color-border-success);background:var(--color-background-success)"><div class="signal-title" style="color:var(--color-text-success)">${s.title}</div><div class="signal-desc">${s.desc}</div></div>`).join('')+
     bears.map(s=>`<div class="signal-card" style="border-color:var(--color-border-danger);background:var(--color-background-danger)"><div class="signal-title" style="color:var(--color-text-danger)">${s.title}</div><div class="signal-desc">${s.desc}</div></div>`).join('');
+
+  // 消息聚合渲染
+  const news = D.news || [];
+  if(news.length) {
+    const flashNews = news.filter(n=>n.type==='flash');
+    const researchNews = news.filter(n=>n.type==='research');
+    const sourceColor = {'金十数据':'#EF9F27','上期所快讯':'#378ADD','泛糖网':'#1D9E75'};
+
+    const flashEl = document.getElementById('news-flash');
+    if(flashEl && flashNews.length) {
+      flashEl.innerHTML = `
+        <div class="card-title" style="font-size:13px;font-weight:500;color:var(--color-text-secondary);margin-bottom:10px">⚡ 实时快讯</div>
+        ${flashNews.map(n=>`
+          <div style="display:flex;align-items:flex-start;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary);gap:10px">
+            <span style="font-size:10px;padding:2px 6px;border-radius:3px;background:${sourceColor[n.source]||'#888'};color:#fff;white-space:nowrap;flex-shrink:0">${n.source}</span>
+            <div style="flex:1">
+              <div style="font-size:13px;line-height:1.5;color:var(--color-text-primary)">${n.title}</div>
+              <div style="font-size:11px;color:var(--color-text-secondary);margin-top:3px">${n.time}</div>
+            </div>
+          </div>`).join('')}`;
+    }
+
+    const researchEl = document.getElementById('news-research');
+    if(researchEl && researchNews.length) {
+      researchEl.innerHTML = `
+        <div class="card-title" style="font-size:13px;font-weight:500;color:var(--color-text-secondary);margin:12px 0 10px">📋 研报与资讯（泛糖网）</div>
+        ${researchNews.map(n=>`
+          <div style="padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:10px;padding:2px 6px;border-radius:3px;background:#1D9E75;color:#fff">${n.source}</span>
+              <span style="font-size:11px;color:var(--color-text-secondary)">${n.time}</span>
+            </div>
+            ${n.url ? `<a href="${n.url}" target="_blank" style="font-size:13px;color:var(--color-text-info);text-decoration:none;line-height:1.5">${n.title}</a>` : `<span style="font-size:13px;color:var(--color-text-primary)">${n.title}</span>`}
+          </div>`).join('')}`;
+    }
+
+    const updateEl = document.getElementById('news-update-time');
+    if(updateEl) updateEl.textContent = `数据更新：${D.update_time||'--'}`;
+  } else {
+    const flashEl = document.getElementById('news-flash');
+    if(flashEl) flashEl.innerHTML = '<div style="color:var(--color-text-secondary);font-size:13px;padding:20px 0;text-align:center">暂无消息，请运行 python sugar_free_fetcher_v4.py 更新数据</div>';
+  }
 }
 
 function initCharts(name) {
@@ -780,6 +833,9 @@ function initCharts(name) {
       const sl=brl.slice(-120);
       mkChart('c-brl','line',sl.map(p=>String(p.date).slice(5)),[{data:sl.map(p=>p.close),borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,0.06)',tension:0.3,fill:true,pointRadius:0,borderWidth:1.5}]);
       charts['c-brl']=true;
+    } else if(!brl.length) {
+      const el=document.getElementById('c-brl');
+      if(el&&el.parentElement) el.parentElement.innerHTML='<div style="text-align:center;padding:40px;color:var(--color-text-secondary);font-size:12px">USD/BRL数据加载中，请重新运行脚本</div>';
     }
     if(!charts['c-sugar-ratio']){
       const labels=['25/04下','25/05上','25/05下','25/06上','25/06下','25/07上','25/07下','25/08上','25/08下','25/09上','25/09下','25/10上'];
