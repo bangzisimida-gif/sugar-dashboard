@@ -225,6 +225,121 @@ def fetch_crude_oil():
 
 
 # ============================================================
+# 消息聚合：多平台白糖资讯
+# ============================================================
+def fetch_news():
+    section("消息聚合（泛糖网 + 上期所快讯）")
+    news_list = []
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept-Language": "zh-CN,zh;q=0.9",
+    }
+    proxies = {"http": None, "https": None}
+
+    # 1. 泛糖网/沐甜网资讯
+    try:
+        from bs4 import BeautifulSoup
+        urls = [
+            ("泛糖网", "https://www.msweet.com.cn/eportal/ui?pageId=1014253"),
+            ("泛糖网", "https://www.msweet.com.cn/eportal/ui?pageId=1014425"),
+        ]
+        seen = set()
+        for source, url in urls:
+            try:
+                r = requests.get(url, headers=headers, proxies=proxies, timeout=8)
+                if r.status_code == 200:
+                    soup = BeautifulSoup(r.text, 'html.parser')
+                    links = soup.find_all('a', href=True)
+                    for a in links:
+                        txt = a.get_text(strip=True)
+                        href = a['href']
+                        if len(txt) > 8 and 'articleKey' in href and txt not in seen:
+                            seen.add(txt)
+                            full_url = href if href.startswith('http') else 'https://www.msweet.com.cn' + href
+                            news_list.append({
+                                "source": source,
+                                "title": txt,
+                                "url": full_url,
+                                "time": datetime.now().strftime("%Y-%m-%d"),
+                                "type": "research",
+                            })
+            except Exception as e:
+                print(f"  {source}失败：{e}")
+        print(f"泛糖网：{len(news_list)} 条")
+    except ImportError:
+        print("需要安装 beautifulsoup4: pip install beautifulsoup4")
+    except Exception as e:
+        print(f"泛糖网失败：{e}")
+
+    # 2. 上期所快讯（过滤白糖相关）
+    try:
+        df = ak.futures_news_shmet()
+        if not df.empty:
+            keywords = ['白糖','食糖','原糖','甘蔗','SR','蔗糖','糖价','郑糖','巴西糖','印度糖','乙醇','糖醇']
+            count = 0
+            for _, row in df.iterrows():
+                content = str(row.get('内容', ''))
+                if any(k in content for k in keywords):
+                    news_list.append({
+                        "source": "上期所快讯",
+                        "title": content[:100],
+                        "url": "",
+                        "time": str(row.get('发布时间', ''))[:16],
+                        "type": "flash",
+                    })
+                    count += 1
+            # 如果过滤后没有白糖相关，取最新5条通用快讯
+            if count == 0:
+                for _, row in df.head(5).iterrows():
+                    news_list.append({
+                        "source": "上期所快讯",
+                        "title": str(row.get('内容', ''))[:100],
+                        "url": "",
+                        "time": str(row.get('发布时间', ''))[:16],
+                        "type": "flash",
+                    })
+            print(f"上期所快讯：{len(df)}条，白糖相关{count}条")
+    except Exception as e:
+        print(f"上期所快讯失败：{e}")
+
+    # 3. 金十数据快讯（过滤白糖相关）
+    try:
+        r = requests.get("https://www.jin10.com/flash_newest.js",
+                         headers=headers, proxies=proxies, timeout=8)
+        if r.status_code == 200:
+            import json
+            text = r.text.strip()
+            if text.startswith('var newest = '):
+                text = text[len('var newest = '):]
+            if text.endswith(';'):
+                text = text[:-1]
+            data = json.loads(text)
+            keywords = ['白糖','食糖','原糖','甘蔗','SR','蔗糖','糖价','郑糖','巴西','印度','乙醇','糖醇','UNICA','Unica']
+            count = 0
+            for d in data:
+                title = d.get('data', {}).get('title', '')
+                content = d.get('data', {}).get('content', '')
+                full_text = title + content
+                if any(k in full_text for k in keywords):
+                    news_list.append({
+                        "source": "金十数据",
+                        "title": (title or content)[:120],
+                        "url": "",
+                        "time": d.get('time', '')[:16],
+                        "type": "flash",
+                    })
+                    count += 1
+            print(f"金十数据：{len(data)}条，白糖相关{count}条")
+    except Exception as e:
+        print(f"金十数据失败：{e}")
+
+    # 按时间倒排
+    news_list.sort(key=lambda x: x.get('time', ''), reverse=True)
+    print(f"消息聚合总计：{len(news_list)} 条")
+    return news_list
+
+
+# ============================================================
 # 新增：NOAA ONI天气指数（厄尔尼诺/拉尼娜）
 # ============================================================
 def fetch_noaa_oni():
@@ -285,17 +400,63 @@ def fetch_noaa_oni():
 # ============================================================
 def fetch_usd_brl():
     section("美元/巴西里亚尔汇率（东方财富）")
+    today = datetime.now().strftime("%Y-%m-%d")
+    cache_file = "usd_brl_cache.json"
+
+    # 读取历史缓存
+    history = []
+    if os.path.exists(cache_file):
+        try:
+            with open(cache_file, "r", encoding="utf-8") as f:
+                history = json.load(f)
+        except Exception:
+            history = []
+
+    # 方法1：历史接口（优先，有完整数据）
+    import time
+    for attempt in range(2):
+        try:
+            df = ak.forex_hist_em(symbol="USDBRL")
+            if not df.empty:
+                df = df.rename(columns={"日期":"date","最新价":"close","今开":"open","最高":"high","最低":"low"})
+                df["date"] = pd.to_datetime(df["date"]).dt.strftime("%Y-%m-%d")
+                df = df[["date","open","high","low","close"]].tail(180)
+                result = df.to_dict(orient="records")
+                with open(cache_file, "w", encoding="utf-8") as f:
+                    json.dump(result, f, ensure_ascii=False)
+                last = df.iloc[-1]
+                print(f"USD/BRL历史接口成功：最新{last['date']} {last['close']:.4f}，共{len(df)}条")
+                return df
+        except Exception as e:
+            print(f"  历史接口第{attempt+1}次失败：{e}")
+            if attempt == 0:
+                time.sleep(2)
+
+    # 方法2：实时接口补充今日价格
     try:
-        df = ak.forex_hist_em(symbol="USDBRL")
-        if not df.empty:
-            df = df.rename(columns={"日期":"date","最新价":"close","今开":"open","最高":"high","最低":"low"})
-            df["date"] = pd.to_datetime(df["date"]).dt.strftime("%Y-%m-%d")
-            df = df[["date","open","high","low","close"]].tail(120)
-            last = df.iloc[-1]
-            print(f"USD/BRL最新：{last['date']} 收盘 {last['close']:.4f}")
-            return df
+        df_spot = ak.forex_spot_em()
+        brl_row = df_spot[df_spot["代码"] == "USDBRL"]
+        if not brl_row.empty:
+            row = brl_row.iloc[0]
+            today_data = {"date": today, "close": float(row["最新价"]),
+                          "open": float(row["今开"]), "high": float(row["最高"]),
+                          "low":  float(row["最低"])}
+            history = [r for r in history if r.get("date") != today]
+            history.append(today_data)
+            history = history[-180:]
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump(history, f, ensure_ascii=False)
+            print(f"USD/BRL实时接口成功：{today} {today_data['close']:.4f}，缓存共{len(history)}条")
+            return pd.DataFrame(history)
     except Exception as e:
-        print(f"USD/BRL失败：{e}")
+        print(f"  实时接口失败：{e}")
+
+    # 方法3：用缓存
+    if history:
+        print(f"USD/BRL使用缓存：{len(history)}条，最新：{history[-1]['date']}")
+        return pd.DataFrame(history)
+
+    print("USD/BRL所有接口均失败")
     return pd.DataFrame()
 
 
@@ -458,7 +619,7 @@ def safe_list(df):
 
 def export_json(price_df, spread_df, receipt_df, basis_info,
                 rank_today, rank_summary, ny_df, import_df,
-                prod_df, import_cost_df=None, crude_df=None, usdbrl_df=None, oni_data=None):
+                prod_df, import_cost_df=None, crude_df=None, usdbrl_df=None, oni_data=None, news_list=None):
     section("生成 Dashboard 数据")
 
     # 郑糖价格（含日期、量价）
@@ -591,6 +752,7 @@ def export_json(price_df, spread_df, receipt_df, basis_info,
         "crude_oil":     crude_list,
         "production":    safe_list(prod_df),
         "weather_oni":   oni_data or {},
+        "news":          news_list or [],
     }
 
     # USD/BRL汇率
@@ -645,13 +807,14 @@ def run():
     import_cost_df = fetch_import_cost()
     import_df   = fetch_import_export()
     crude_df    = fetch_crude_oil()
+    news_list   = fetch_news()
     oni_data    = fetch_noaa_oni()
     usdbrl_df   = fetch_usd_brl()
     prod_df     = fetch_production_sales()
 
     export_json(price_df, spread_df, receipt_df, basis_info,
                 rank_today, rank_summary, ny_df, import_df,
-                prod_df, import_cost_df, crude_df, usdbrl_df, oni_data)
+                prod_df, import_cost_df, crude_df, usdbrl_df, oni_data, news_list)
 
     section("汇总完成")
     for name, df in [
