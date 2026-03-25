@@ -225,6 +225,62 @@ def fetch_crude_oil():
 
 
 # ============================================================
+# 新增：NOAA ONI天气指数（厄尔尼诺/拉尼娜）
+# ============================================================
+def fetch_noaa_oni():
+    section("NOAA ONI天气指数（厄尔尼诺/拉尼娜）")
+    try:
+        r = requests.get(
+            "https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt",
+            headers={"User-Agent":"Mozilla/5.0"},
+            proxies={"http":None,"https":None}, timeout=10
+        )
+        lines = [l.strip() for l in r.text.strip().split('\n') if l.strip()]
+        records = []
+        for line in lines[1:]:  # 跳过标题行
+            parts = line.split()
+            if len(parts) >= 4:
+                try:
+                    records.append({
+                        "season": parts[0],
+                        "year":   parts[1],
+                        "sst":    float(parts[2]),
+                        "oni":    float(parts[3]),
+                    })
+                except Exception:
+                    pass
+        if not records:
+            return {}
+        latest = records[-1]
+        oni = latest["oni"]
+        if oni <= -0.5:
+            status, direction = "拉尼娜", "bull"
+            detail = f"ONI={oni}，拉尼娜持续，广西降雨偏多，甘蔗生长有利，利多"
+        elif oni >= 0.5:
+            status, direction = "厄尔尼诺", "bear"
+            detail = f"ONI={oni}，厄尔尼诺活跃，广西高温干旱风险↑，甘蔗减产压力，利空"
+        elif oni > 0:
+            status, direction = "中性偏暖", "neu"
+            detail = f"ONI={oni}，天气中性偏暖，对产量影响有限"
+        else:
+            status, direction = "中性（拉尼娜消退）", "neu"
+            detail = f"ONI={oni}，从拉尼娜向中性回归，NOAA预计Q2可能转厄尔尼诺，关注广西降雨变化"
+        print(f"最新季节：{latest['season']} {latest['year']}  ONI={oni}  → {status}")
+        return {
+            "season":    f"{latest['season']} {latest['year']}",
+            "oni":       oni,
+            "status":    status,
+            "direction": direction,
+            "detail":    detail,
+            "history":   records[-12:],  # 近12季
+            "updated":   datetime.now().strftime("%Y-%m-%d"),
+        }
+    except Exception as e:
+        print(f"NOAA ONI获取失败：{e}")
+        return {}
+
+
+# ============================================================
 # 新增：美元/巴西里亚尔汇率
 # ============================================================
 def fetch_usd_brl():
@@ -402,7 +458,7 @@ def safe_list(df):
 
 def export_json(price_df, spread_df, receipt_df, basis_info,
                 rank_today, rank_summary, ny_df, import_df,
-                prod_df, import_cost_df=None, crude_df=None, usdbrl_df=None):
+                prod_df, import_cost_df=None, crude_df=None, usdbrl_df=None, oni_data=None):
     section("生成 Dashboard 数据")
 
     # 郑糖价格（含日期、量价）
@@ -534,6 +590,7 @@ def export_json(price_df, spread_df, receipt_df, basis_info,
         "import_cost":   import_cost_list,
         "crude_oil":     crude_list,
         "production":    safe_list(prod_df),
+        "weather_oni":   oni_data or {},
     }
 
     # USD/BRL汇率
@@ -588,12 +645,13 @@ def run():
     import_cost_df = fetch_import_cost()
     import_df   = fetch_import_export()
     crude_df    = fetch_crude_oil()
+    oni_data    = fetch_noaa_oni()
     usdbrl_df   = fetch_usd_brl()
     prod_df     = fetch_production_sales()
 
     export_json(price_df, spread_df, receipt_df, basis_info,
                 rank_today, rank_summary, ny_df, import_df,
-                prod_df, import_cost_df, crude_df, usdbrl_df)
+                prod_df, import_cost_df, crude_df, usdbrl_df, oni_data)
 
     section("汇总完成")
     for name, df in [

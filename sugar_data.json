@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-03-25 18:23",
+  "update_time": "2026-03-25 20:18",
   "basis": 1.0,
   "spot_price": 5430.0,
   "futures_price": 5429.0,
@@ -9601,9 +9601,9 @@
     },
     {
       "date": "2026-03-25",
-      "close": 87.42,
+      "close": 87.14,
       "high": 89.57,
-      "low": 86.59
+      "low": 86.46
     }
   ],
   "production": [
@@ -9933,5 +9933,87 @@
       "增减": 0.0
     }
   ],
+  "weather_oni": {
+    "season": "DJF 2026",
+    "oni": -0.39,
+    "status": "中性（拉尼娜消退）",
+    "direction": "neu",
+    "detail": "ONI=-0.39，从拉尼娜向中性回归，NOAA预计Q2可能转厄尔尼诺，关注广西降雨变化",
+    "history": [
+      {
+        "season": "JFM",
+        "year": "2025",
+        "sst": 26.48,
+        "oni": -0.24
+      },
+      {
+        "season": "FMA",
+        "year": "2025",
+        "sst": 27.11,
+        "oni": -0.06
+      },
+      {
+        "season": "MAM",
+        "year": "2025",
+        "sst": 27.6,
+        "oni": 0.02
+      },
+      {
+        "season": "AMJ",
+        "year": "2025",
+        "sst": 27.72,
+        "oni": -0.02
+      },
+      {
+        "season": "MJJ",
+        "year": "2025",
+        "sst": 27.54,
+        "oni": -0.04
+      },
+      {
+        "season": "JJA",
+        "year": "2025",
+        "sst": 27.1,
+        "oni": -0.14
+      },
+      {
+        "season": "JAS",
+        "year": "2025",
+        "sst": 26.63,
+        "oni": -0.28
+      },
+      {
+        "season": "ASO",
+        "year": "2025",
+        "sst": 26.32,
+        "oni": -0.4
+      },
+      {
+        "season": "SON",
+        "year": "2025",
+        "sst": 26.16,
+        "oni": -0.51
+      },
+      {
+        "season": "OND",
+        "year": "2025",
+        "sst": 26.05,
+        "oni": -0.55
+      },
+      {
+        "season": "NDJ",
+        "year": "2025",
+        "sst": 25.97,
+        "oni": -0.54
+      },
+      {
+        "season": "DJF",
+        "year": "2026",
+        "sst": 26.11,
+        "oni": -0.39
+      }
+    ],
+    "updated": "2026-03-25"
+  },
   "usd_brl": []
 }
