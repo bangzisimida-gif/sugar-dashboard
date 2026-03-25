@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-03-25 20:18",
+  "update_time": "2026-03-25 23:01",
   "basis": 1.0,
   "spot_price": 5430.0,
   "futures_price": 5429.0,
@@ -9601,7 +9601,7 @@
     },
     {
       "date": "2026-03-25",
-      "close": 87.14,
+      "close": 89.04,
       "high": 89.57,
       "low": 86.46
     }
@@ -10015,5 +10015,119 @@
     ],
     "updated": "2026-03-25"
   },
+  "news": [
+    {
+      "source": "上期所快讯",
+      "title": "【快讯】SHMET03月25日讯，据港交所文件：星环信息科技（上海）股份有限公司向港交所提交上市申请书。",
+      "url": "",
+      "time": "2026-03-25 22:48",
+      "type": "flash"
+    },
+    {
+      "source": "上期所快讯",
+      "title": "【快讯】SHMET03月25日讯，委内瑞拉代总统罗德里格斯：委内瑞拉经济将摆脱制裁。",
+      "url": "",
+      "time": "2026-03-25 22:46",
+      "type": "flash"
+    },
+    {
+      "source": "上期所快讯",
+      "title": "【安徽大学团队研发磁性表征新方法 为存储器件研发开辟新路径】SHMET03月25日讯，记者25日从安徽大学获悉，该校材料科学与工程学部团队在磁性表征技术领域取得研究突破，成功开发出可在原子尺度解析反铁",
+      "url": "",
+      "time": "2026-03-25 22:46",
+      "type": "flash"
+    },
+    {
+      "source": "上期所快讯",
+      "title": "【快讯】SHMET03月25日讯，委内瑞拉代总统罗德里格斯：委内瑞拉外交官正前往华盛顿，以恢复双边关系。",
+      "url": "",
+      "time": "2026-03-25 22:44",
+      "type": "flash"
+    },
+    {
+      "source": "上期所快讯",
+      "title": "【快讯】SHMET03月25日讯，达拉斯联储：50%受访者预计2026年钻井数量不会增加，47%的受访者预计油井数量将小幅或大幅增加。",
+      "url": "",
+      "time": "2026-03-25 22:44",
+      "type": "flash"
+    },
+    {
+      "source": "泛糖网",
+      "title": "近期云南降温降雨、大风天气对食糖...",
+      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3191788&columnId=1014253",
+      "time": "2026-03-25",
+      "type": "research"
+    },
+    {
+      "source": "泛糖网",
+      "title": "近期云南降温降雨、大风天气对食糖生产造成的影响分析",
+      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3191788&columnId=1014253",
+      "time": "2026-03-25",
+      "type": "research"
+    },
+    {
+      "source": "泛糖网",
+      "title": "油价引发白糖市场波动加剧 AI提示风险要点",
+      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3190385&columnId=1014253",
+      "time": "2026-03-25",
+      "type": "research"
+    },
+    {
+      "source": "泛糖网",
+      "title": "近5年云南食糖铁路外运数据变化特征及趋势分析",
+      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3187819&columnId=1014253",
+      "time": "2026-03-25",
+      "type": "research"
+    },
+    {
+      "source": "泛糖网",
+      "title": "2026年春节广西南华、凤糖食糖出库及装车安排",
+      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3187411&columnId=1014253",
+      "time": "2026-03-25",
+      "type": "research"
+    },
+    {
+      "source": "泛糖网",
+      "title": "2026年中央一号文件涉糖部分 AI提示近十年要点",
+      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3186802&columnId=1014253",
+      "time": "2026-03-25",
+      "type": "research"
+    },
+    {
+      "source": "泛糖网",
+      "title": "2025年配额外原糖到港量年报",
+      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3184015&columnId=1014253",
+      "time": "2026-03-25",
+      "type": "research"
+    },
+    {
+      "source": "泛糖网",
+      "title": "期货涨幅破百 白糖现货成交放量",
+      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3181311&columnId=1014253",
+      "time": "2026-03-25",
+      "type": "research"
+    },
+    {
+      "source": "泛糖网",
+      "title": "11月广西、云南第三在库库存分析",
+      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3176584&columnId=1014253",
+      "time": "2026-03-25",
+      "type": "research"
+    },
+    {
+      "source": "泛糖网",
+      "title": "云南南华2024/25榨季陈糖已全部售罄 新糖报价5480元/吨",
+      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3176191&columnId=1014253",
+      "time": "2026-03-25",
+      "type": "research"
+    },
+    {
+      "source": "泛糖网",
+      "title": "广西南华24/25榨季产糖清库 静待新糖上市",
+      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3172497&columnId=1014253",
+      "time": "2026-03-25",
+      "type": "research"
+    }
+  ],
   "usd_brl": []
 }
