@@ -225,6 +225,25 @@ def fetch_crude_oil():
 
 
 # ============================================================
+# 新增：美元/巴西里亚尔汇率
+# ============================================================
+def fetch_usd_brl():
+    section("美元/巴西里亚尔汇率（东方财富）")
+    try:
+        df = ak.forex_hist_em(symbol="USDBRL")
+        if not df.empty:
+            df = df.rename(columns={"日期":"date","最新价":"close","今开":"open","最高":"high","最低":"low"})
+            df["date"] = pd.to_datetime(df["date"]).dt.strftime("%Y-%m-%d")
+            df = df[["date","open","high","low","close"]].tail(120)
+            last = df.iloc[-1]
+            print(f"USD/BRL最新：{last['date']} 收盘 {last['close']:.4f}")
+            return df
+    except Exception as e:
+        print(f"USD/BRL失败：{e}")
+    return pd.DataFrame()
+
+
+# ============================================================
 # ⑩ 国内产销存（东方财富备用）
 # ============================================================
 def fetch_production_sales():
@@ -383,7 +402,7 @@ def safe_list(df):
 
 def export_json(price_df, spread_df, receipt_df, basis_info,
                 rank_today, rank_summary, ny_df, import_df,
-                prod_df, import_cost_df=None, crude_df=None):
+                prod_df, import_cost_df=None, crude_df=None, usdbrl_df=None):
     section("生成 Dashboard 数据")
 
     # 郑糖价格（含日期、量价）
@@ -517,6 +536,19 @@ def export_json(price_df, spread_df, receipt_df, basis_info,
         "production":    safe_list(prod_df),
     }
 
+    # USD/BRL汇率
+    usdbrl_list = []
+    if usdbrl_df is not None and not usdbrl_df.empty:
+        for _, r in usdbrl_df.iterrows():
+            try:
+                usdbrl_list.append({
+                    "date":  str(r["date"]),
+                    "close": float(r["close"]),
+                })
+            except Exception:
+                pass
+    data["usd_brl"] = usdbrl_list
+
     with open("sugar_data.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
@@ -556,18 +588,19 @@ def run():
     import_cost_df = fetch_import_cost()
     import_df   = fetch_import_export()
     crude_df    = fetch_crude_oil()
+    usdbrl_df   = fetch_usd_brl()
     prod_df     = fetch_production_sales()
 
     export_json(price_df, spread_df, receipt_df, basis_info,
                 rank_today, rank_summary, ny_df, import_df,
-                prod_df, import_cost_df, crude_df)
+                prod_df, import_cost_df, crude_df, usdbrl_df)
 
     section("汇总完成")
     for name, df in [
         ("郑糖日线", price_df), ("跨期价差", spread_df), ("注册仓单", receipt_df),
         ("龙虎榜",   rank_today), ("龙虎榜历史", rank_hist), ("多空汇总", rank_summary),
         ("纽约原糖", ny_df), ("进口利润", import_df), ("进口成本", import_cost_df),
-        ("WTI原油",  crude_df), ("产销存",   prod_df),
+        ("WTI原油",  crude_df), ("USD/BRL", usdbrl_df), ("产销存",   prod_df),
     ]:
         status = f"{len(df)} 条" if df is not None and not df.empty else "无数据"
         print(f"  {name:<12} {status}")
