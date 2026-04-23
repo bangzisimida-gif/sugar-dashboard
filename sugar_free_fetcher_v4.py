@@ -129,25 +129,43 @@ def calc_basis(price_df, spot=SPOT_PRICE):
 # ============================================================
 def fetch_warehouse_receipt():
     section("注册仓单历史")
+    cache_file = "receipt_cache.json"
+    history = []
+    if os.path.exists(cache_file):
+        try:
+            with open(cache_file, "r", encoding="utf-8") as f:
+                history = json.load(f)
+        except Exception:
+            history = []
     try:
-        td  = last_trade_day(1)
-        d45 = (datetime.today() - timedelta(days=45)).strftime("%Y%m%d")
-        df  = ak.get_receipt(start_date=d45, end_date=td, vars_list=["SR"])
-        if not df.empty:
-            print(df.tail(10).to_string(index=False))
-            return df
-    except Exception as e:
-        print(f"get_receipt失败：{e}")
-    try:
-        data = ak.futures_warehouse_receipt_czce()
+        data = ak.futures_czce_warehouse_receipt()
         if isinstance(data, dict) and "SR" in data:
-            df = data["SR"]
-            total = df[df.iloc[:,0].astype(str).str.contains("总计")]["仓单数量"].values
-            print(f"白糖仓单总量：{total[0] if len(total) else '未知'} 张")
-            return df
+            df_today = data["SR"]
+            total = 0
+            if "仓单数量" in df_today.columns:
+                total = int(pd.to_numeric(df_today["仓单数量"], errors="coerce").fillna(0).sum())
+            elif df_today.shape[1] >= 6:
+                total = int(pd.to_numeric(df_today.iloc[:, 5], errors="coerce").fillna(0).sum())
+            if total > 0:
+                prev_total = history[-1]["receipt"] if history else total
+                chg = total - prev_total
+                today_str = datetime.now().strftime("%Y%m%d")
+                today_data = {"date": today_str, "receipt": total, "receipt_chg": chg}
+                history = [r for r in history if r.get("date") != today_str]
+                history.append(today_data)
+                history = history[-60:]
+                with open(cache_file, "w", encoding="utf-8") as f:
+                    json.dump(history, f, ensure_ascii=False)
+                print(f"白糖仓单总量：{total} 张（日增减：{chg:+d}），共{len(history)}条")
+                return pd.DataFrame(history)
     except Exception as e:
-        print(f"明细接口失败：{e}")
+        print(f"仓单接口失败：{e}")
+    if history:
+        print(f"使用仓单缓存：{len(history)}条")
+        return pd.DataFrame(history)
+    print("仓单获取失败")
     return pd.DataFrame()
+
 
 
 # ============================================================
