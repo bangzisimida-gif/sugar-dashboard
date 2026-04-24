@@ -273,7 +273,13 @@ def fetch_news():
                         href = a['href']
                         if len(txt) > 8 and 'articleKey' in href and txt not in seen:
                             seen.add(txt)
-                            full_url = href if href.startswith('http') else 'https://www.msweet.com.cn' + href
+                            # 正确拼接完整URL
+                            if href.startswith('http'):
+                                full_url = href
+                            elif href.startswith('?'):
+                                full_url = 'https://www.msweet.com.cn/eportal/ui' + href
+                            else:
+                                full_url = 'https://www.msweet.com.cn' + href
                             news_list.append({
                                 "source": source,
                                 "title": txt,
