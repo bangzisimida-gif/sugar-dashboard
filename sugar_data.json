@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-04-24 01:43",
-  "basis": -40.0,
-  "spot_price": 5355.0,
-  "futures_price": 5395.0,
+  "update_time": "2026-04-24 23:26",
+  "basis": -39.0,
+  "spot_price": 5358.0,
+  "futures_price": 5397.0,
   "price": [
     {
       "date": "1.0",
@@ -2181,6 +2181,15 @@
       "close": 5395.0,
       "volume": 469048,
       "position": 591994
+    },
+    {
+      "date": "243.0",
+      "open": 5400.0,
+      "high": 5432.0,
+      "low": 5389.0,
+      "close": 5397.0,
+      "volume": 346033,
+      "position": 589183
     }
   ],
   "spread": [
@@ -2491,6 +2500,10 @@
     {
       "idx": 77,
       "spread": -41.0
+    },
+    {
+      "idx": 78,
+      "spread": -40.0
     }
   ],
   "receipt": [
@@ -4137,12 +4150,6 @@
     }
   ],
   "ny_sugar": [
-    {
-      "date": "2024-08-02",
-      "close": 18.14,
-      "spot": 6292.0,
-      "index": 6590.0
-    },
     {
       "date": "2024-08-05",
       "close": 18.01,
@@ -6536,6 +6543,12 @@
       "close": 14.08,
       "spot": 5355.0,
       "index": 5487.0
+    },
+    {
+      "date": "2026-04-23",
+      "close": 14.17,
+      "spot": 5358.0,
+      "index": 5507.0
     }
   ],
   "import_export": [
@@ -9064,12 +9077,6 @@
   ],
   "crude_oil": [
     {
-      "date": "2025-11-04",
-      "close": 60.42,
-      "high": 61.03,
-      "low": 59.94
-    },
-    {
       "date": "2025-11-05",
       "close": 59.62,
       "high": 61.09,
@@ -9779,21 +9786,22 @@
     },
     {
       "date": "2026-04-23",
-      "close": 97.46,
-      "high": 97.49,
+      "close": 96.98,
+      "high": 98.39,
       "low": 92.3
+    },
+    {
+      "date": "2026-04-24",
+      "close": 95.46,
+      "high": 97.85,
+      "low": 93.63
     }
   ],
   "production": [
     {
-      "日期": 1768262400000,
-      "库存": 9499,
-      "增减": null
-    },
-    {
       "日期": 1768348800000,
       "库存": 9739,
-      "增减": 240.0
+      "增减": null
     },
     {
       "日期": 1768435200000,
@@ -10114,6 +10122,11 @@
       "日期": 1776902400000,
       "库存": 17766,
       "增减": 0.0
+    },
+    {
+      "日期": 1776988800000,
+      "库存": 18066,
+      "增减": 300.0
     }
   ],
   "weather_oni": {
@@ -10201,51 +10214,51 @@
   "news": [
     {
       "source": "金十数据",
-      "title": "TRUMP TO GREET ISRAELI AND LEBANESE AMBASSADORS AT THE WHITE HOUSE TONIGHT. - AXIOS, CITING A SENIOR US OFFICIAL",
+      "title": "LEBANESE DEPUTY PM MITRI: WE RESORTED TO NEGOTIATIONS WITH ISRAEL IN ORDER TO AVOID A LONG WAR - AL-HADATH",
       "url": "",
-      "time": "2026-04-24 01:25",
+      "time": "2026-04-24 23:20",
+      "type": "flash"
+    },
+    {
+      "source": "上期所快讯",
+      "title": "【快讯】SHMET04月24日讯，美国贸易代表格里尔：美国与欧盟宣布一项行动计划，以协调双方在关键矿产领域的贸易政策，并将探索达成具有约束力的多边协议的可能性。",
+      "url": "",
+      "time": "2026-04-24 23:02",
+      "type": "flash"
+    },
+    {
+      "source": "上期所快讯",
+      "title": "【快讯】SHMET04月24日讯，美股三大股指走势分化，纳指涨超1%，标普500指数涨0.4%，道指跌0.3%。",
+      "url": "",
+      "time": "2026-04-24 22:59",
+      "type": "flash"
+    },
+    {
+      "source": "上期所快讯",
+      "title": "【快讯】SHMET04月24日讯，贝克休斯预计2026年下半年和2027年将加大上游投资。",
+      "url": "",
+      "time": "2026-04-24 22:58",
       "type": "flash"
     },
     {
       "source": "金十数据",
-      "title": "ISRAELI OFFICIALS: TRUMP OFFERING HAND IN FRIENDSHIP BUT NO ONE TO NEGOTIATE WITH - ISRAEL'S N12 NEWS",
+      "title": "【美防长：美对伊朗港口封锁将“视需要”持续下去】金十数据4月24日讯，美国国防部长赫格塞思24日说，美国海军于13日开始对伊朗港口实施的封锁将“视需要”持续下去。赫格塞思当天同美军参谋长联席会议主席凯恩在五角大楼举行新闻发布会。赫格塞思说，",
       "url": "",
-      "time": "2026-04-24 01:18",
+      "time": "2026-04-24 22:55",
       "type": "flash"
     },
     {
-      "source": "金十数据",
-      "title": "<b>ISRAELI ASSESSMENT SAYS RENEWED FIGHTING IN IRAN SEEMS APPROACHING - ISRAEL'S N12 NEWS</b>",
+      "source": "上期所快讯",
+      "title": "【快讯】SHMET04月24日讯，据港交所文件：上海箱箱智能科技股份有限公司向港交所提交上市申请书。",
       "url": "",
-      "time": "2026-04-24 01:18",
+      "time": "2026-04-24 22:53",
       "type": "flash"
     },
     {
-      "source": "金十数据",
-      "title": "TRUMP IS NOT EAGER TO RESUME THE WAR, BUT MAY NOT HAVE A CHOICE - ISRAEL'S CHANNEL 12, CITING US OFFICIALS",
+      "source": "上期所快讯",
+      "title": "【快讯】SHMET04月24日讯，美国国务卿鲁比奥：与欧盟就关键矿产达成的谅解备忘录标志着重要进展。",
       "url": "",
-      "time": "2026-04-24 01:17",
-      "type": "flash"
-    },
-    {
-      "source": "金十数据",
-      "title": "IRAN'S PARLIAMENT SPEAKER GHALIBAF HAS RESIGNED, ACCORDING TO ISRAEL'S N12 NEWS",
-      "url": "",
-      "time": "2026-04-24 01:03",
-      "type": "flash"
-    },
-    {
-      "source": "金十数据",
-      "title": "<b>TRUMP WILL ATTEND A MEETING BETWEEN THE AMBASSADORS OF LEBANON AND ISRAEL AT THE WHITE HOUSE - AL ARABIYA</b>",
-      "url": "",
-      "time": "2026-04-24 01:01",
-      "type": "flash"
-    },
-    {
-      "source": "金十数据",
-      "title": "ISRAELI MILITARY SAYS IT KILLED TWO ARMED MEN IN SOUTHERN LEBANON AFTER THEY 'APPROACHED SOLDIERS'",
-      "url": "",
-      "time": "2026-04-24 00:46",
+      "time": "2026-04-24 22:51",
       "type": "flash"
     },
     {
@@ -10324,41 +10337,6 @@
       "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3176191&columnId=1014253",
       "time": "2026-04-24",
       "type": "research"
-    },
-    {
-      "source": "上期所快讯",
-      "title": "【金田股份：2025年净利润同比增长56.16% 拟10派1.4元】SHMET04月23日讯，金田股份(601609)4月23日披露年报，2025年实现营业收入1250.64亿元，同比增长0.73%；",
-      "url": "",
-      "time": "2026-04-23 21:44",
-      "type": "flash"
-    },
-    {
-      "source": "上期所快讯",
-      "title": "【金田股份：一季度净利润同比增长12.91%】SHMET04月23日讯，金田股份(601609)4月23日披露一季报，公司2026年一季度实现营业收入364.76亿元，同比增长33.68%；归母净利润",
-      "url": "",
-      "time": "2026-04-23 21:44",
-      "type": "flash"
-    },
-    {
-      "source": "上期所快讯",
-      "title": "【瑞士宝盛：铜市场供应依然充足】SHMET04月23日讯，瑞士宝盛分析师Carsten Menke表示，铜市场供应依然充足，至少在短期内是如此，这反映出供应反弹和需求受损。铜价已迅速反弹，回到今年早些",
-      "url": "",
-      "time": "2026-04-23 21:43",
-      "type": "flash"
-    },
-    {
-      "source": "上期所快讯",
-      "title": "【锌业股份：一季度净利润7371.44万元 同比增长158.81%】锌业股份(000751)4月23日披露一季报，公司2026年一季度实现营业收入51.54亿元，同比增长26.35%；归母净利润737",
-      "url": "",
-      "time": "2026-04-23 21:42",
-      "type": "flash"
-    },
-    {
-      "source": "上期所快讯",
-      "title": "【宁德时代：宁波联创询价转让完毕 持股比例降至5%以下】SHMET04月23日讯，宁德时代(300750.SZ)公告称，公司持股5%以上股东宁波联合创新新能源投资管理合伙企业(有限合伙)通过询价转让方",
-      "url": "",
-      "time": "2026-04-23 21:41",
-      "type": "flash"
     }
   ],
   "usd_brl": [
