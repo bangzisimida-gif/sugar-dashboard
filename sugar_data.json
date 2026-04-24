@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-04-24 23:26",
+  "update_time": "2026-04-24 23:33",
   "basis": -39.0,
   "spot_price": 5358.0,
   "futures_price": 5397.0,
@@ -9792,7 +9792,7 @@
     },
     {
       "date": "2026-04-24",
-      "close": 95.46,
+      "close": 95.51,
       "high": 97.85,
       "low": 93.63
     }
@@ -10221,6 +10221,27 @@
     },
     {
       "source": "上期所快讯",
+      "title": "【快讯】SHMET04月24日讯，以色列总理内塔尼亚胡：我们正与特朗普总统进行全面合作。",
+      "url": "",
+      "time": "2026-04-24 23:11",
+      "type": "flash"
+    },
+    {
+      "source": "上期所快讯",
+      "title": "【快讯】SHMET04月24日讯，以色列总理内塔尼亚胡：真主党昨日对我们发动了攻击，而我们今天将对其进行打击。我们保留充分的行动自由，以应对真主党的任何威胁。",
+      "url": "",
+      "time": "2026-04-24 23:10",
+      "type": "flash"
+    },
+    {
+      "source": "上期所快讯",
+      "title": "【快讯】SHMET04月24日讯，市场消息：美国量化交易公司和做市商Jane Street录得创纪录的396亿美元交易收入。",
+      "url": "",
+      "time": "2026-04-24 23:03",
+      "type": "flash"
+    },
+    {
+      "source": "上期所快讯",
       "title": "【快讯】SHMET04月24日讯，美国贸易代表格里尔：美国与欧盟宣布一项行动计划，以协调双方在关键矿产领域的贸易政策，并将探索达成具有约束力的多边协议的可能性。",
       "url": "",
       "time": "2026-04-24 23:02",
@@ -10234,13 +10255,6 @@
       "type": "flash"
     },
     {
-      "source": "上期所快讯",
-      "title": "【快讯】SHMET04月24日讯，贝克休斯预计2026年下半年和2027年将加大上游投资。",
-      "url": "",
-      "time": "2026-04-24 22:58",
-      "type": "flash"
-    },
-    {
       "source": "金十数据",
       "title": "【美防长：美对伊朗港口封锁将“视需要”持续下去】金十数据4月24日讯，美国国防部长赫格塞思24日说，美国海军于13日开始对伊朗港口实施的封锁将“视需要”持续下去。赫格塞思当天同美军参谋长联席会议主席凯恩在五角大楼举行新闻发布会。赫格塞思说，",
       "url": "",
@@ -10248,93 +10262,79 @@
       "type": "flash"
     },
     {
-      "source": "上期所快讯",
-      "title": "【快讯】SHMET04月24日讯，据港交所文件：上海箱箱智能科技股份有限公司向港交所提交上市申请书。",
-      "url": "",
-      "time": "2026-04-24 22:53",
-      "type": "flash"
-    },
-    {
-      "source": "上期所快讯",
-      "title": "【快讯】SHMET04月24日讯，美国国务卿鲁比奥：与欧盟就关键矿产达成的谅解备忘录标志着重要进展。",
-      "url": "",
-      "time": "2026-04-24 22:51",
-      "type": "flash"
-    },
-    {
       "source": "泛糖网",
       "title": "产销均大幅超预期 25/26榨季广西最...",
-      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3193983&columnId=1014253",
+      "url": "https://www.msweet.com.cn/eportal/ui?pageId=1014425&articleKey=3193983&columnId=1014253",
       "time": "2026-04-24",
       "type": "research"
     },
     {
       "source": "泛糖网",
       "title": "产销均大幅超预期 25/26榨季广西最终能产多少糖？",
-      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3193983&columnId=1014253",
+      "url": "https://www.msweet.com.cn/eportal/ui?pageId=1014425&articleKey=3193983&columnId=1014253",
       "time": "2026-04-24",
       "type": "research"
     },
     {
       "source": "泛糖网",
       "title": "近期云南降温降雨、大风天气对食糖生产造成的影响分析",
-      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3191788&columnId=1014253",
+      "url": "https://www.msweet.com.cn/eportal/ui?pageId=1014425&articleKey=3191788&columnId=1014253",
       "time": "2026-04-24",
       "type": "research"
     },
     {
       "source": "泛糖网",
       "title": "油价引发白糖市场波动加剧 AI提示风险要点",
-      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3190385&columnId=1014253",
+      "url": "https://www.msweet.com.cn/eportal/ui?pageId=1014425&articleKey=3190385&columnId=1014253",
       "time": "2026-04-24",
       "type": "research"
     },
     {
       "source": "泛糖网",
       "title": "近5年云南食糖铁路外运数据变化特征及趋势分析",
-      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3187819&columnId=1014253",
+      "url": "https://www.msweet.com.cn/eportal/ui?pageId=1014425&articleKey=3187819&columnId=1014253",
       "time": "2026-04-24",
       "type": "research"
     },
     {
       "source": "泛糖网",
       "title": "2026年春节广西南华、凤糖食糖出库及装车安排",
-      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3187411&columnId=1014253",
+      "url": "https://www.msweet.com.cn/eportal/ui?pageId=1014425&articleKey=3187411&columnId=1014253",
       "time": "2026-04-24",
       "type": "research"
     },
     {
       "source": "泛糖网",
       "title": "2026年中央一号文件涉糖部分 AI提示近十年要点",
-      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3186802&columnId=1014253",
+      "url": "https://www.msweet.com.cn/eportal/ui?pageId=1014425&articleKey=3186802&columnId=1014253",
       "time": "2026-04-24",
       "type": "research"
     },
     {
       "source": "泛糖网",
       "title": "2025年配额外原糖到港量年报",
-      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3184015&columnId=1014253",
+      "url": "https://www.msweet.com.cn/eportal/ui?pageId=1014425&articleKey=3184015&columnId=1014253",
       "time": "2026-04-24",
       "type": "research"
     },
     {
       "source": "泛糖网",
       "title": "期货涨幅破百 白糖现货成交放量",
-      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3181311&columnId=1014253",
+      "url": "https://www.msweet.com.cn/eportal/ui?pageId=1014425&articleKey=3181311&columnId=1014253",
       "time": "2026-04-24",
       "type": "research"
     },
     {
       "source": "泛糖网",
       "title": "11月广西、云南第三在库库存分析",
-      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3176584&columnId=1014253",
+      "url": "https://www.msweet.com.cn/eportal/ui?pageId=1014425&articleKey=3176584&columnId=1014253",
       "time": "2026-04-24",
       "type": "research"
     },
     {
       "source": "泛糖网",
       "title": "云南南华2024/25榨季陈糖已全部售罄 新糖报价5480元/吨",
-      "url": "https://www.msweet.com.cn?pageId=1014425&articleKey=3176191&columnId=1014253",
+      "url": "https://www.msweet.com.cn/eportal/ui?pageId=1014425&articleKey=3176191&columnId=1014253",
       "time": "2026-04-24",
       "type": "research"
     }
